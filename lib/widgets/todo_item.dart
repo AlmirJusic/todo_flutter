@@ -14,6 +14,7 @@ class ToDoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaffold = ScaffoldMessenger.of(context); //mora zbog async
     final providerToDo = Provider.of<ToDoProvider>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
@@ -44,10 +45,10 @@ class ToDoItem extends StatelessWidget {
           motion: const ScrollMotion(),
           children: [
             SlidableAction(
-              onPressed: (context) {
-                providerToDo.removeToDo(todo);
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(
+              onPressed: (context) async {
+                await providerToDo.removeToDo(todo.id);
+                scaffold.hideCurrentSnackBar();
+                scaffold.showSnackBar(
                   const SnackBar(
                     content: Text('Deleted the task!'),
                     duration: Duration(seconds: 2),
@@ -69,9 +70,9 @@ class ToDoItem extends StatelessWidget {
               Checkbox(
                 value: todo.isCompleted,
                 onChanged: (_) {
-                  final isCompleted = providerToDo.toggleToDoStatus(todo);
+                  providerToDo.toggleToDoStatus(todo);
 
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  /*  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(isCompleted
@@ -79,7 +80,7 @@ class ToDoItem extends StatelessWidget {
                           : 'Task is not completed!'),
                       duration: const Duration(seconds: 2),
                     ),
-                  );
+                  ); */
                 },
                 activeColor: Theme.of(context).colorScheme.primary,
                 checkColor: Colors.white,

@@ -28,16 +28,16 @@ class _CrudToDoScreenState extends State<CrudToDoScreen> {
     }
   }
 
-  void saveForm() {
+  Future<void> saveForm() async {
     final isValid = _formKey.currentState!.validate();
-
+    final provider = Provider.of<ToDoProvider>(context, listen: false);
+    final navigator = Navigator.of(context);
     if (!isValid) {
       return;
     } else if (widget.isEdit) {
-      final provider = Provider.of<ToDoProvider>(context, listen: false);
-
-      provider.updateToDo(widget.todo!, title, description!);
-      Navigator.of(context).pop();
+      await provider.updateToDo(
+          widget.todo!.id, title, description!, widget.todo!);
+      navigator.pop();
     } else {
       final todo = Todo(
         createdTime: DateTime.now(),
@@ -46,10 +46,13 @@ class _CrudToDoScreenState extends State<CrudToDoScreen> {
         description: description,
       );
 
-      final providerToDo = Provider.of<ToDoProvider>(context, listen: false);
+      try {
+        await provider.addToDo(todo);
+      } catch (e) {
+        rethrow;
+      }
 
-      providerToDo.addToDo(todo);
-      Navigator.of(context).pop();
+      navigator.pop();
     }
   }
 
@@ -65,7 +68,7 @@ class _CrudToDoScreenState extends State<CrudToDoScreen> {
             child: IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () {
-                providerToDo.removeToDo(widget.todo!);
+                providerToDo.removeToDo(widget.todo!.id);
 
                 Navigator.of(context).pop();
               },

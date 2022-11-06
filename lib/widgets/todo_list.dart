@@ -4,8 +4,20 @@ import './todo_item.dart';
 
 import '../providers/ToDoProvider.dart';
 
-class ToDoList extends StatelessWidget {
+class ToDoList extends StatefulWidget {
   const ToDoList({super.key});
+
+  @override
+  State<ToDoList> createState() => _ToDoListState();
+}
+
+class _ToDoListState extends State<ToDoList> {
+  @override
+  void initState() {
+    Provider.of<ToDoProvider>(context, listen: false).getToDos();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

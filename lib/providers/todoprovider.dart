@@ -7,6 +7,9 @@ import '../helpers/http_exception.dart';
 import '../models/todo.dart';
 
 class ToDoProvider extends ChangeNotifier {
+  final String? authToken;
+  final String? userId;
+
   List<Todo> _toDoList = [
 /*    Todo(
       id: '1',
@@ -36,6 +39,9 @@ class ToDoProvider extends ChangeNotifier {
       title: 'Plan Jacobs birthday party 🎉🥳',
     ), */
   ];
+  ToDoProvider(this.authToken, this.userId, this._toDoList);
+
+  List<Todo> get toDoList => _toDoList.toList();
 
   List<Todo> get toDoIncompletedList =>
       _toDoList.where((todo) => todo.isCompleted == false).toList();
@@ -45,7 +51,7 @@ class ToDoProvider extends ChangeNotifier {
 
   Future<void> addToDo(Todo todo) async {
     final url = Uri.parse(
-        'https://todo-app-flutter-12837-default-rtdb.europe-west1.firebasedatabase.app/todos.json');
+        'https://todo-app-flutter-12837-default-rtdb.europe-west1.firebasedatabase.app/users/$userId/todos.json?auth=$authToken');
 
     final timeStamp = DateTime.now();
     try {
@@ -76,7 +82,7 @@ class ToDoProvider extends ChangeNotifier {
 
   Future<void> getToDos() async {
     final url = Uri.parse(
-        'https://todo-app-flutter-12837-default-rtdb.europe-west1.firebasedatabase.app/todos.json');
+        'https://todo-app-flutter-12837-default-rtdb.europe-west1.firebasedatabase.app/users/$userId/todos.json?auth=$authToken');
 
     try {
       final response = await http.get(url);
@@ -104,6 +110,11 @@ class ToDoProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> Ocisti() async {
+    _toDoList = [];
+    notifyListeners();
+  }
+
   Future<void> updateToDo(
       String id, String title, String description, Todo newTodo) async {
     try {
@@ -111,7 +122,7 @@ class ToDoProvider extends ChangeNotifier {
 
       if (todoIndex >= 0) {
         final url = Uri.parse(
-            'https://todo-app-flutter-12837-default-rtdb.europe-west1.firebasedatabase.app/todos/$id.json');
+            'https://todo-app-flutter-12837-default-rtdb.europe-west1.firebasedatabase.app/users/$userId/todos/$id.json?auth=$authToken');
         await http.patch(url,
             body: json.encode({
               'title': title,
@@ -134,7 +145,7 @@ class ToDoProvider extends ChangeNotifier {
   Future<void> toggleToDoStatus(Todo todo) async {
     String id = todo.id;
     final url = Uri.parse(
-        'https://todo-app-flutter-12837-default-rtdb.europe-west1.firebasedatabase.app/todos/$id.json');
+        'https://todo-app-flutter-12837-default-rtdb.europe-west1.firebasedatabase.app/users/$userId/todos/$id.json?auth=$authToken');
 
     final oldStatus = todo.isCompleted;
     todo.isCompleted = !todo.isCompleted;
@@ -160,7 +171,7 @@ class ToDoProvider extends ChangeNotifier {
 
   Future<void> removeToDo(String id) async {
     final url = Uri.parse(
-        'https://todo-app-flutter-12837-default-rtdb.europe-west1.firebasedatabase.app/todos/$id.json');
+        'https://todo-app-flutter-12837-default-rtdb.europe-west1.firebasedatabase.app/users/$userId/todos/$id.json?auth=$authToken');
 
     final existingToDoIndex =
         _toDoList.indexWhere((element) => element.id == id);
